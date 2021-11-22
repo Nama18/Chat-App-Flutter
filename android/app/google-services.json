@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "433604645119",
+    "project_id": "chatapp-29e81",
+    "storage_bucket": "chatapp-29e81.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:433604645119:android:deb3944a501d52ed16bcca",
+        "android_client_info": {
+          "package_name": "com.drexapp.chatapp_flutter"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "433604645119-pm2m37r2no2leu0o226vsghntrf058vq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.drexapp.chatapp_flutter",
+            "certificate_hash": "d5cab8a1001acb89dee2368306489645c4d44a28"
+          }
+        },
+        {
+          "client_id": "433604645119-q0106o6p44qlg6h3ut35u49uo23g41bl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBX_JoU1VqJZvLyqfwP08WDUS4QsB-L-OY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "433604645119-q0106o6p44qlg6h3ut35u49uo23g41bl.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
