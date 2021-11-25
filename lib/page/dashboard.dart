@@ -1,18 +1,19 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:chatapp_flutter/event/event_person.dart';
 import 'package:chatapp_flutter/event/event_storage.dart';
 import 'package:chatapp_flutter/model/person.dart';
+import 'package:chatapp_flutter/page/edit_profile.dart';
 import 'package:chatapp_flutter/page/forgot_password.dart';
 import 'package:chatapp_flutter/page/fragment/list_chat_rooom.dart';
+import 'package:chatapp_flutter/page/fragment/list_contact.dart';
 import 'package:chatapp_flutter/page/login.dart';
 import 'package:chatapp_flutter/utils/prefs.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
-
-import 'fragment/list_contact.dart';
 
 class Dashboard extends StatefulWidget {
   @override
@@ -21,11 +22,13 @@ class Dashboard extends StatefulWidget {
 
 class _DashboardState extends State<Dashboard> {
   Person _myPerson;
+  var _controllerPassword = TextEditingController();
 
   List<Widget> _listFragment = [
     ListChatRoom(),
     ListContact(),
   ];
+
   void getMyPerson() async {
     Person person = await Prefs.getPerson();
     setState(() {
@@ -101,6 +104,65 @@ class _DashboardState extends State<Dashboard> {
     }
   }
 
+  void deleteAccount() async {
+    var value = await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return SimpleDialog(
+          titlePadding: EdgeInsets.fromLTRB(16, 16, 16, 0),
+          contentPadding: EdgeInsets.all(16),
+          title: Text('Delete Account'),
+          children: [
+            TextField(
+              controller: _controllerPassword,
+              decoration: InputDecoration(
+                labelText: 'Password',
+              ),
+              textAlignVertical: TextAlignVertical.bottom,
+              obscureText: true,
+            ),
+            SizedBox(height: 16),
+            RaisedButton(
+              child: Text('Delete'),
+              color: Colors.blue,
+              textColor: Colors.white,
+              onPressed: () {
+                if (_controllerPassword.text != null &&
+                    _controllerPassword.text != '') {
+                  Navigator.pop(context, 'delete');
+                }
+              },
+            ),
+            OutlineButton(
+              child: Text('Close'),
+              textColor: Colors.blue,
+              onPressed: () => Navigator.pop(context),
+            ),
+          ],
+        );
+      },
+    );
+    if (value == 'delete') {
+      Navigator.pop(context);
+      UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: _myPerson.email,
+        password: _controllerPassword.text,
+      );
+      if (userCredential != null) {
+        userCredential.user.delete().then((value) {
+          EventPerson.deleteAccount(_myPerson.uid);
+        });
+      }
+      _controllerPassword.clear();
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => Login()),
+      );
+    }
+  }
+
   @override
   void initState() {
     getMyPerson();
@@ -110,25 +172,21 @@ class _DashboardState extends State<Dashboard> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      initialIndex : 0,
-      length : 2,
+      initialIndex: 0,
+      length: 2,
       child: Scaffold(
         appBar: AppBar(
           titleSpacing: 0,
-          title: Text('ChatApp Flutter'),
+          title: Text('ChatApp'),
           bottom: TabBar(
             tabs: [
-              Tab(
-                text: 'Chat Room'
-              ),
-              Tab(
-                text: 'Contact'
-              ),
+              Tab(text: 'Chat Room'),
+              Tab(text: 'Contact'),
             ],
           ),
         ),
         drawer: menuDrawer(),
-        body: TabBarView(children:  _listFragment),
+        body: TabBarView(children: _listFragment),
       ),
     );
   }
@@ -160,7 +218,7 @@ class _DashboardState extends State<Dashboard> {
                     },
                   ),
                 ),
-                SizedBox(width: 10),
+                SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -186,15 +244,24 @@ class _DashboardState extends State<Dashboard> {
             ),
           ),
           ListTile(
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => EditProfile(person: _myPerson),
+                ),
+              ).then((value) => getMyPerson());
+            },
             leading: Icon(Icons.person),
             title: Text('Edit Profile'),
             trailing: Icon(Icons.navigate_next),
           ),
           ListTile(
             onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => ForgotPassword()));
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ForgotPassword()),
+              );
             },
             leading: Icon(Icons.lock),
             title: Text('Reset Password'),
@@ -208,13 +275,21 @@ class _DashboardState extends State<Dashboard> {
             title: Text('Edit Photo'),
             trailing: Icon(Icons.navigate_next),
           ),
+          Divider(height: 1, thickness: 1),
           ListTile(
-            onTap: () async {
+            onTap: () {
+              deleteAccount();
+            },
+            leading: Icon(Icons.delete_forever),
+            title: Text('Delete Account'),
+          ),
+          Divider(height: 1, thickness: 1),
+          ListTile(
+            onTap: () {
               logout();
             },
             leading: Icon(Icons.logout),
-            title: Text('Log out'),
-            trailing: Icon(Icons.navigate_next),
+            title: Text('Logout'),
           ),
         ],
       ),

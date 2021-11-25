@@ -2,7 +2,6 @@ import 'package:chatapp_flutter/event/event_person.dart';
 import 'package:chatapp_flutter/model/person.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 class Register extends StatefulWidget {
   @override
@@ -11,23 +10,23 @@ class Register extends StatefulWidget {
 
 class _RegisterState extends State<Register> {
   var _formKey = GlobalKey<FormState>();
-  var _controllereEmail = TextEditingController();
-  var _controllerePassword = TextEditingController();
   var _controllerName = TextEditingController();
+  var _controllerEmail = TextEditingController();
+  var _controllerPassword = TextEditingController();
   var _scaffoldKey = GlobalKey<ScaffoldState>();
 
   void registerAccount() async {
-    if (await EventPerson.checkEmail(_controllereEmail.text) == '') {
+    if (await EventPerson.checkEmail(_controllerEmail.text) == '') {
       try {
         UserCredential userCredential =
             await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: _controllereEmail.text,
-          password: _controllerePassword.text,
+          email: _controllerEmail.text,
+          password: _controllerPassword.text,
         );
         if (userCredential.user.uid != null) {
           showNotifSnackBar('Register Success');
           Person person = Person(
-            email: _controllereEmail.text,
+            email: _controllerEmail.text,
             name: _controllerName.text,
             photo: '',
             token: '',
@@ -36,8 +35,8 @@ class _RegisterState extends State<Register> {
           EventPerson.addPerson(person);
           await userCredential.user.sendEmailVerification();
           _controllerName.clear();
-          _controllereEmail.clear();
-          _controllerePassword.clear();
+          _controllerEmail.clear();
+          _controllerPassword.clear();
         } else {
           showNotifSnackBar('Register Failed');
         }
@@ -79,13 +78,14 @@ class _RegisterState extends State<Register> {
                   Text('Already have account?'),
                   SizedBox(width: 8),
                   GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: Text(
-                        'Login',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      )),
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text(
+                      'Login',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -94,13 +94,11 @@ class _RegisterState extends State<Register> {
               child: Form(
                 key: _formKey,
                 child: Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: EdgeInsets.all(16),
                   child: SingleChildScrollView(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        SizedBox(height: 30),
                         Center(
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(20),
@@ -114,30 +112,35 @@ class _RegisterState extends State<Register> {
                         ),
                         SizedBox(height: 30),
                         TextFormField(
-                          validator: (value) =>
-                              value == '' ? "Dont Empty" : null,
                           controller: _controllerName,
+                          validator: (value) =>
+                              value == '' ? "Don't Empty" : null,
                           decoration: InputDecoration(
-                              hintText: 'Name', prefixIcon: Icon(Icons.person)),
+                            hintText: 'Name',
+                            prefixIcon: Icon(Icons.person),
+                          ),
                           textAlignVertical: TextAlignVertical.center,
                         ),
                         SizedBox(height: 8),
                         TextFormField(
+                          controller: _controllerEmail,
                           validator: (value) =>
-                              value == '' ? "Dont Empty" : null,
-                          controller: _controllereEmail,
+                              value == '' ? "Don't Empty" : null,
                           decoration: InputDecoration(
-                              hintText: 'Email', prefixIcon: Icon(Icons.email)),
+                            hintText: 'Email',
+                            prefixIcon: Icon(Icons.email),
+                          ),
                           textAlignVertical: TextAlignVertical.center,
                         ),
                         SizedBox(height: 8),
                         TextFormField(
+                          controller: _controllerPassword,
                           validator: (value) =>
-                              value == '' ? "Dont Empty" : null,
-                          controller: _controllerePassword,
+                              value == '' ? "Don't Empty" : null,
                           decoration: InputDecoration(
-                              hintText: 'Password',
-                              prefixIcon: Icon(Icons.lock)),
+                            hintText: 'Password',
+                            prefixIcon: Icon(Icons.lock),
+                          ),
                           textAlignVertical: TextAlignVertical.center,
                           obscureText: true,
                         ),
@@ -146,7 +149,6 @@ class _RegisterState extends State<Register> {
                           child: RaisedButton(
                             onPressed: () {
                               if (_formKey.currentState.validate()) {
-                                //RegisterAuth
                                 registerAccount();
                               }
                             },
@@ -154,7 +156,7 @@ class _RegisterState extends State<Register> {
                             color: Colors.blue,
                             textColor: Colors.white,
                           ),
-                        )
+                        ),
                       ],
                     ),
                   ),

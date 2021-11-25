@@ -2,6 +2,8 @@
 import 'package:chatapp_flutter/event/event_contact.dart';
 import 'package:chatapp_flutter/event/event_person.dart';
 import 'package:chatapp_flutter/model/person.dart';
+import 'package:chatapp_flutter/model/room.dart';
+import 'package:chatapp_flutter/page/chat_room.dart';
 import 'package:chatapp_flutter/utils/prefs.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -167,21 +169,22 @@ class _ListContactState extends State<ListContact> {
       trailing: IconButton(
         icon: Icon(Icons.message),
         onPressed: () {
-          // Room room = Room(
-          //   email: person.email,
-          //   inRoom: false,
-          //   lastChat: '',
-          //   lastDateTime: 0,
-          //   lastUid: '',
-          //   name: person.name,
-          //   photo: person.photo,
-          //   type: '',
-          //   uid: person.uid,
-          // );
-          // Navigator.push(
-          //   context,
-          //   MaterialPageRoute(builder: (context) => ChatRoom(room: room)),
-          // );
+          Room room = Room(
+            email: person.email,
+            inRoom: false,
+            lastChat: '',
+            lastDateTime: 0,
+            lastUid: '',
+            name: person.name,
+            photo: person.photo,
+            type: '',
+            uid: person.uid,
+          );
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ChatRoom(room: room)),
+            
+          );
         },
       ),
     );

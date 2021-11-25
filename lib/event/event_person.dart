@@ -1,7 +1,7 @@
 import 'package:chatapp_flutter/model/person.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class EventPerson{
+class EventPerson {
   static Future<String> checkEmail(String email) async {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
         .collection('person')
@@ -17,6 +17,7 @@ class EventPerson{
     }
     return '';
   }
+
   static void addPerson(Person person) {
     try {
       FirebaseFirestore.instance
@@ -29,6 +30,7 @@ class EventPerson{
       print(e);
     }
   }
+
   static void updatePersonToken(String myUid, String token) async {
     try {
       // update profile
@@ -92,5 +94,54 @@ class EventPerson{
       print(e);
     }
     return token;
+  }
+
+  static void deleteAccount(String myUid) async {
+    try {
+      // delete in person
+      FirebaseFirestore.instance
+          .collection('person')
+          .doc(myUid)
+          .delete()
+          .then((value) => null)
+          .catchError((onError) => print(onError));
+      // delete in contact
+      QuerySnapshot querySnapshot =
+          await FirebaseFirestore.instance.collection('person').get();
+      querySnapshot.docs.forEach((QueryDocumentSnapshot queryDocumentSnapshot) {
+        queryDocumentSnapshot.reference
+            .collection('contact')
+            .where('uid', isEqualTo: myUid)
+            .get()
+            .then((value) {
+          value.docs.forEach((docContact) {
+            docContact.reference
+                .delete()
+                .then((value) => null)
+                .catchError((onError) => print(onError));
+          });
+        });
+      });
+      // delete in room
+      QuerySnapshot querySnapshot2 =
+          await FirebaseFirestore.instance.collection('person').get();
+      querySnapshot2.docs
+          .forEach((QueryDocumentSnapshot queryDocumentSnapshot) {
+        queryDocumentSnapshot.reference
+            .collection('room')
+            .where('uid', isEqualTo: myUid)
+            .get()
+            .then((value) {
+          value.docs.forEach((docRoom) {
+            docRoom.reference
+                .delete()
+                .then((value) => null)
+                .catchError((onError) => print(onError));
+          });
+        });
+      });
+    } catch (e) {
+      print(e);
+    }
   }
 }
